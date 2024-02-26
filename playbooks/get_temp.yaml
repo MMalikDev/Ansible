@@ -1,0 +1,9 @@
+- name: Get Thermals
+  hosts: nodes
+  tasks:
+    - name: Get CPU Temperature
+      shell: vcgencmd measure_temp
+      register: thermals
+    - name: Show Temperatures
+      debug:
+        var: thermals.stdout_lines

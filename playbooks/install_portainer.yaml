@@ -1,0 +1,17 @@
+- name: Install Portainer
+  hosts: nodes
+  become: true
+  tasks:
+    - name: Deploy Portainer
+      community.docker.docker_container:
+        image: portainer/portainer-ce:latest
+        restart_policy: unless-stopped
+        container_name: portainer
+
+      volumes:
+        - /var/lib/docker/volumes:/var/lib/docker/volumes
+        - /var/run/docker.sock:/var/run/docker.sock
+        - data:/data
+
+      ports:
+        - "9000:9000"

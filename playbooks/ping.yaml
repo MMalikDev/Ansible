@@ -1,0 +1,7 @@
+- name: Verify Connections
+  gather_facts: false
+  hosts: all
+
+  tasks:
+    - name: Ping
+      ping:
