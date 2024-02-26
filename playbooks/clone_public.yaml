@@ -1,0 +1,12 @@
+- name: Clone Public Git Repo
+  hosts: nodes
+
+  vars:
+    GIT_REPO: "{{ lookup('env', 'GIT_REPO' }}"
+
+  tasks:
+    - name: Clone git repository
+      git:
+        repo: "{{ GIT_REPO }}"
+        dest: /srv/checkout
+        version: main
