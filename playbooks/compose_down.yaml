@@ -1,0 +1,24 @@
+- name: Stop Docker Compose
+  hosts: nodes
+  become: true
+
+  vars:
+    workdir: "{{ lookup('env', 'WORKDIR', default='docker/') }}"
+
+  tasks:
+    - name: Check if Compose Directory Exist
+      stat:
+        path: "{{ workdir }}"
+      register: directory
+
+    - name: Stop Services
+      community.docker.docker_compose:
+        project_src: "{{ workdir }}"
+        state: absent
+      when: directory.stat.exists
+
+    - name: Delete Compose Directory
+      file:
+        path: "{{ workdir }}"
+        state: absent
+      when: directory.stat.exists

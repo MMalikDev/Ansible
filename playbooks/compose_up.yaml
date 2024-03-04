@@ -1,0 +1,23 @@
+- name: Run Docker Compose
+  hosts: nodes
+  become: true
+
+  vars:
+    workdir: "{{ lookup('env', 'WORKDIR', default='docker/') }}"
+    source: "{{ lookup('env', 'SRC_DIR') }}"
+
+  tasks:
+    - name: Check Dependencies
+      apt:
+        name: "docker-compose"
+        state: present
+
+    - name: Copy Compose Directory
+      copy:
+        src: "{{ source }}"
+        dest: "{{ workdir }}"
+
+    - name: Start Services
+      community.docker.docker_compose:
+        project_src: "{{ workdir }}"
+        state: present

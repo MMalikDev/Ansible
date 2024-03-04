@@ -1,0 +1,41 @@
+- name: Install docker
+  become: true
+  hosts: all
+  vars:
+    url: "https://download.docker.com/linux/debian"
+    version: "{{ ansible_lsb.codename | lower }}"
+    keyrings: "/etc/apt/keyrings/docker.gpg"
+
+  tasks:
+    - name: Get architecture
+      shell: dpkg --print-architecture
+      register: arch
+
+    - name: Install Docker Dependencies
+      ansible.builtin.apt:
+        update_cache: yes
+        name:
+          - curl
+          - ca-certificates
+
+    - name: Add Docker GPG Key
+      ansible.builtin.apt_key:
+        url: "{{ url }}/gpg"
+        keyring: "{{ keyrings }}"
+        state: present
+
+    - name: Add Docker Repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch={{ arch.stdout }} signed-by={{ keyrings }}] {{ url }} {{ version }} stable
+        filename: docker
+        state: present
+
+    - name: Install Docker Engine
+      ansible.builtin.apt:
+        update_cache: yes
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
