@@ -1,0 +1,59 @@
+- name: Add NFS Storage Server
+  become: true
+  hosts: nodes
+
+  vars:
+    SUBNET: "{{ lookup('env', 'SUBNET', default='192.168.8.0/24') }}"
+    CLIENTS: "/mnt/nfs {{ SUBNET }}(rw,sync,no_subtree_check)"
+
+  tasks:
+    - name: Install NFS Kernel Server
+      ansible.builtin.apt:
+        update_cache: yes
+        name:
+          - nfs-kernel-server
+
+    - name: Create Export Directory
+      ansible.builtin.file:
+        path: /mnt/nfs
+        state: directory
+        recursive: true
+        group: nogroup
+        owner: nobody
+        mode: 0777
+
+      # shell: |
+      #   sudo mkdir -p /mnt/nfs
+      #   sudo chmod 777 /mnt/nfs
+      #   sudo chown nobody:nogroup /mnt/nfs
+
+    - name: Check if Subnet is Already Added
+      lineinfile:
+        state: absent
+        path: "/etc/exports"
+        regexp: "^{{ CLIENTS }}"
+      check_mode: true
+      changed_when: false
+      register: check
+
+    - name: Grant Machines in Subnet Access to The NFS Server
+      lineinfile:
+        state: present
+        path: "/etc/exports"
+        line: "{{ CLIENTS }}"
+      when: check.found == 0
+
+      # shell: sudo echo /mnt/nfs 192.168.8.0/24(rw,sync,no_subtree_check) >> /etc/exports
+
+    - name: Re-export the share
+      # command: exportfs -rav
+
+      # shell: sudo exportfs -a
+
+    - name: Restart Service
+      ansible.builtin.systemd:
+        state: started
+        daemon_reload: yes
+        name: nfs-kernel-server.service
+
+      # shell:  sudo systemctl restart nfs-kernel-server

@@ -1,8 +1,16 @@
-version: "3.8"
+networks:
+  proxy:
+    name: proxy
 
 volumes:
   config:
   cache:
+  media:
+    driver: local
+    driver_opts:
+      o: bind
+      type: exfat
+      device: /mnt/media
 
 services:
   jellyfin:
@@ -11,9 +19,11 @@ services:
     restart: unless-stopped
 
     volumes:
-      - cache:/cache
       - config:/config
-      - mnt/media:/media
+      - cache:/cache
+      - media:/media
 
+    networks:
+      proxy:
     ports:
       - 80:8096

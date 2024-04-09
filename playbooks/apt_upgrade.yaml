@@ -1,4 +1,4 @@
-- name: Update Packages
+- name: Upgrade Distro
   become: true
   hosts: all
 
@@ -7,7 +7,6 @@
       ansible.builtin.apt:
         upgrade: yes
         update_cache: yes
-        cache_valid_time: 3600
 
     - name: Check if a reboot is required
       ansible.builtin.stat:
