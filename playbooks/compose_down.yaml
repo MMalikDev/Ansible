@@ -12,7 +12,7 @@
       register: directory
 
     - name: Stop Services
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ workdir }}"
         state: absent
       when: directory.stat.exists
