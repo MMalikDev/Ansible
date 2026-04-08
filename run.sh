@@ -74,15 +74,36 @@ run_playbooks_wsl_ubuntu(){
     wsl --exec ./run.sh -r $@
 }
 
+run_with_fuzzy_search(){
+    local file=$(eza --color=always --icons playbooks | fzf --ansi --preview='bat --color=always playbooks/{}')
+    load_env
+    handle_credentials set
+    source .venv/bin/activate
+    ansible-playbook "playbooks/${file}"
+    handle_credentials clear
+}
+run_with_fuzzy_search_alt(){
+    local file=$(eza --color=always --icons playbooks | tv files --ansi)
+    load_env
+    handle_credentials set
+    source .venv/bin/activate
+    ansible-playbook "playbooks/${file}"
+    handle_credentials clear
+
+}
+
+
 # ---------------------------------------------------------------------- #
 # Main Function
 # ---------------------------------------------------------------------- #
 main(){
-    while getopts "uisp:r:d:w:h" OPTION; do
+    while getopts "uisftp:r:d:w:h" OPTION; do
         case $OPTION in
             u) install_ansible_ubuntu           ;;
             i) install_prerequisites            ;;
             s) setup_ansible_venv               ;;
+            f) run_with_fuzzy_search            ;;
+            t) run_with_fuzzy_search_alt        ;;
             p) run_playbooks_venv $OPTARG       ;;
             r) run_playbooks_cli $OPTARG        ;;
             d) run_playbooks_wsl_debian $OPTARG ;;

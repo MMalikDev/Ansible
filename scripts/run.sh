@@ -15,6 +15,8 @@ Run Ansible commands [REQUIRES ANSIBLE CLI]
      -u             Install Ansible CLI on Ubuntu
      -i             Install prerequisites for venv setup
      -s             Setup Ansible using local python venv
+     -f             Run Ansible playbook using fzf selection
+     -t             Run Ansible playbook using tv selection
      -p [PLAYBOOK]  Run Ansible playbook on nodes using venv
      -r [PLAYBOOK]  Run Ansible playbook on nodes using CLI
      -d [PLAYBOOK]  Run Ansible playbook on nodes using WSL Debian (venv)
@@ -31,7 +33,7 @@ get_env(){
 }
 get_bool(){
     local variable=$(get_env "$@" | tr '[A-Z]' '[a-z]')
-    
+
     if [[ $variable =~ (1|true) ]]; then
         echo true
     else
@@ -47,7 +49,7 @@ handle_errors(){
         printf "\n$icon_start Error encountered!\n\n"
         exit 1
     fi
-    
+
     clear
     printf "\n$icon_log Cleared logs...\n\n"
 }
